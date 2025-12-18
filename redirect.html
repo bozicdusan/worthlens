@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting to WorthLens</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        color: #0b1220;
+      }
+      .wrap {
+        text-align: center;
+        padding: 2rem;
+      }
+      .logo {
+        width: 128px;
+        height: 128px;
+        margin: 0 auto 1rem;
+        border-radius: 24px;
+      }
+      p {
+        font-size: 0.95rem;
+        color: #6b7280;
+      }
+      .fallback-link {
+        display: inline-block;
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        color: #0b1220;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .android-message {
+        display: none;
+        margin-top: 1rem;
+      }
+      .android-message h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #0b1220;
+        margin-bottom: 0.5rem;
+      }
+      .android-message p {
+        font-size: 0.95rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+      }
+      .android-message .date {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #0b1220;
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <img src="favicon.webp" alt="WorthLens app icon" class="logo" />
+      <div id="android-message" class="android-message">
+        <h2>Sorry, WorthLens is not yet available on Android</h2>
+        <p>Stay tuned for the official release date!</p>
+        <p class="date">January 2, 2026</p>
+      </div>
+      <p id="fallback-text" style="display:none;">
+        If nothing happens, tap below to open the store manually.
+      </p>
+      <a id="fallback-link" class="fallback-link" href="#" style="display:none;">Open store manually</a>
+    </div>
+
+    <script>
+      (function () {
+        // TODO: Replace these with your real store URLs
+        var IOS_URL = "https://apps.apple.com/us/app/worthlens/id6756556501"; // App Store
+        var ANDROID_URL = "https://play.google.com/store/apps/details?id=com.worthlens.app"; // Play Store
+
+        function detectPlatform() {
+          var ua = navigator.userAgent || navigator.vendor || window.opera;
+          ua = ua.toLowerCase();
+
+          if (/iphone|ipad|ipod/.test(ua)) return "ios";
+          if (/android/.test(ua)) return "android";
+          return "other";
+        }
+
+        function goToStore() {
+          var platform = detectPlatform();
+          
+          if (platform === "android") {
+            // Show Android unavailable message instead of redirecting
+            showAndroidMessage();
+            return;
+          }
+          
+          var targetUrl = platform === "ios" ? IOS_URL : null;
+
+          if (targetUrl) {
+            window.location.replace(targetUrl);
+          } else {
+            // Show manual fallback for unsupported platforms
+            showFallback("https://apps.apple.com/us/app/worthlens/id6756556501");
+          }
+        }
+
+        function showAndroidMessage() {
+          var message = document.getElementById("android-message");
+          if (message) {
+            message.style.display = "block";
+          }
+        }
+
+        function showFallback(url) {
+          var text = document.getElementById("fallback-text");
+          var link = document.getElementById("fallback-link");
+          if (!text || !link) return;
+
+          text.style.display = "block";
+          link.style.display = "inline-block";
+          link.href = url;
+        }
+
+        // Start redirect shortly after load
+        window.addEventListener("load", function () {
+          var platform = detectPlatform();
+          
+          if (platform === "android") {
+            // Show Android message immediately
+            showAndroidMessage();
+          } else {
+            setTimeout(goToStore, 400);
+
+            // After a few seconds, if user is still here, expose fallback
+            setTimeout(function () {
+              if (document.visibilityState === "visible") {
+                showFallback(IOS_URL);
+              }
+            }, 4000);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
+

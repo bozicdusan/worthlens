@@ -1,0 +1,1356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WorthLens - Turn Photos into Profit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="favicon.webp" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --color-background: #f4f6fb;
+        --color-foreground: #0b1220;
+        --color-primary: #0b1220;
+        --color-primary-soft: rgba(15, 23, 42, 0.06);
+        --color-secondary: #f5b300;
+        --color-muted: #6b7280;
+        --color-border: #e5e7eb;
+        --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.08);
+        --shadow-strong: 0 30px 80px rgba(15, 23, 42, 0.25);
+        --radius-lg: 24px;
+        --radius-xl: 32px;
+        --nav-height: 76px;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background-color: var(--color-background);
+        color: var(--color-foreground);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        font: inherit;
+        border: none;
+        background: none;
+        cursor: pointer;
+      }
+
+      h1, h2, h3, h4 {
+        font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: -0.02em;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      main {
+        padding-top: calc(var(--nav-height) + 16px);
+      }
+
+      /* Header / Nav */
+      .site-header {
+        position: fixed;
+        inset-block-start: 0;
+        inset-inline: 0;
+        z-index: 40;
+        padding-block: 1.1rem;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
+      }
+
+      .site-header--scrolled {
+        background: rgba(244, 246, 251, 0.9);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+        padding-block: 0.7rem;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+      }
+
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .nav-logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+
+      .brand-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: -0.02em;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 1.75rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+
+      .nav-links a:not(.btn) {
+        position: relative;
+        color: var(--color-muted);
+        transition: color 0.2s ease;
+      }
+
+      .nav-links a:not(.btn)::after {
+        content: "";
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-end: -0.2rem;
+        width: 0;
+        height: 2px;
+        background-color: var(--color-secondary);
+        transition: width 0.2s ease;
+      }
+
+      .nav-links a:not(.btn):hover {
+        color: var(--color-secondary);
+      }
+
+      .nav-links a:not(.btn):hover::after {
+        width: 100%;
+      }
+
+      .nav-cta {
+        margin-inline-start: 0.5rem;
+      }
+
+      .nav-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      }
+
+      .nav-toggle svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .nav-links--desktop {
+        display: none;
+      }
+
+      /* Mobile nav */
+      .mobile-nav {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.35);
+        display: flex;
+        justify-content: flex-end;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        z-index: 30;
+      }
+
+      .mobile-nav-panel {
+        width: 80%;
+        max-width: 320px;
+        background: #ffffff;
+        height: 100%;
+        padding: 2rem 1.5rem;
+        box-shadow: -18px 0 45px rgba(15, 23, 42, 0.25);
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mobile-nav.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .mobile-nav.open .mobile-nav-panel {
+        transform: translateX(0);
+      }
+
+      .mobile-nav-close {
+        align-self: flex-end;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        margin-block-end: 2rem;
+      }
+
+      .mobile-nav-close svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .mobile-nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+
+      .mobile-nav-links a:not(.btn) {
+        color: #0f172a;
+      }
+
+      .btn-block {
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        padding-inline: 1.75rem;
+        height: 3rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: 1px solid transparent;
+        transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .btn-large {
+        height: 3.5rem;
+        font-size: 1rem;
+        padding-inline: 2.25rem;
+      }
+
+      .btn-primary {
+        background-color: var(--color-primary);
+        color: #ffffff;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.45);
+      }
+
+      .btn-primary:hover {
+        background-color: #020617;
+        transform: translateY(-1px);
+        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.55);
+      }
+
+      .btn-outline {
+        background-color: rgba(255, 255, 255, 0.9);
+        color: var(--color-foreground);
+        border-color: rgba(148, 163, 184, 0.6);
+      }
+
+      .btn-outline:hover {
+        background-color: rgba(15, 23, 42, 0.03);
+        border-color: rgba(15, 23, 42, 0.4);
+      }
+
+      .btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* Hero */
+      .hero {
+        position: relative;
+        padding-block: 5.5rem 4.5rem;
+        overflow: hidden;
+      }
+
+      @media (min-width: 1024px) {
+        .hero {
+          padding-block: 7.5rem 6rem;
+        }
+      }
+
+      .hero-bg {
+        position: absolute;
+        width: 520px;
+        height: 520px;
+        border-radius: 999px;
+        filter: blur(96px);
+        opacity: 0.55;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .hero-bg--top {
+        inset-block-start: -240px;
+        inset-inline-end: -260px;
+        background: rgba(245, 179, 0, 0.25);
+      }
+
+      .hero-bg--bottom {
+        inset-block-end: -260px;
+        inset-inline-start: -260px;
+        background: rgba(15, 23, 42, 0.12);
+      }
+
+      .hero-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+      }
+
+      @media (min-width: 1024px) {
+        .hero-inner {
+          flex-direction: row;
+          align-items: center;
+          gap: 4rem;
+        }
+      }
+
+      .hero-copy {
+        flex: 1.1;
+        max-width: 34rem;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(245, 179, 0, 0.12);
+        border: 1px solid rgba(245, 179, 0, 0.45);
+        color: var(--color-secondary);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        margin-block-end: 1.5rem;
+      }
+
+      .hero-badge svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+      }
+
+      .hero-title {
+        font-size: clamp(2.65rem, 4vw + 1.5rem, 3.9rem);
+        line-height: 1.05;
+        margin-block-end: 1.25rem;
+        color: var(--color-primary);
+      }
+
+      .hero-highlight {
+        position: relative;
+        display: inline-block;
+        color: var(--color-secondary);
+      }
+
+      .hero-highlight svg {
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-end: 2px;
+        width: 100%;
+        height: 10px;
+        z-index: -1;
+        color: rgba(245, 179, 0, 0.45);
+      }
+
+      .hero-highlight path {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 8;
+        stroke-linecap: round;
+      }
+
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--color-muted);
+        margin-block-end: 1.9rem;
+        max-width: 34rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        margin-block-end: 2.1rem;
+      }
+
+      @media (min-width: 640px) {
+        .hero-actions {
+          flex-direction: row;
+        }
+      }
+
+      .hero-trust {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        font-size: 0.9rem;
+        color: var(--color-muted);
+      }
+
+      .avatar-group {
+        display: flex;
+      }
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 2px solid #ffffff;
+        overflow: hidden;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+        background: #e5e7eb;
+      }
+
+      .avatar + .avatar {
+        margin-inline-start: -10px;
+      }
+
+      .hero-phones {
+        flex: 1;
+        position: relative;
+        display: none;
+      }
+
+      @media (min-width: 1024px) {
+        .hero-phones {
+          display: block;
+        }
+      }
+
+      .hero-mockup {
+        max-width: 420px;
+        margin-inline: auto;
+        display: block;
+      }
+
+      /* Sections */
+      .section {
+        padding-block: 4.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .section {
+          padding-block: 5.5rem;
+        }
+      }
+
+      .section--muted {
+        background-color: #f3f4f6;
+      }
+
+      .section--primary {
+        background-color: var(--color-primary);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .section--primary::before {
+        content: "";
+        position: absolute;
+        inset: -50%;
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.12;
+        pointer-events: none;
+      }
+
+      .section-header {
+        text-align: center;
+        max-width: 32rem;
+        margin: 0 auto 3rem;
+      }
+
+      .section-header h2 {
+        font-size: clamp(1.8rem, 2.1vw + 1.1rem, 2.4rem);
+        margin-bottom: 0.75rem;
+        color: var(--color-primary);
+      }
+
+      .section-header p {
+        color: var(--color-muted);
+        font-size: 0.98rem;
+      }
+
+      .section--primary .section-header h2 {
+        color: #ffffff;
+      }
+
+      .section--primary .section-header p {
+        color: rgba(248, 250, 252, 0.8);
+      }
+
+      /* Features */
+      .feature-grid {
+        display: grid;
+        gap: 1.75rem;
+      }
+
+      @media (min-width: 640px) {
+        .feature-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .feature-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+      }
+
+      .feature-card {
+        padding: 1.5rem;
+        border-radius: 20px;
+        background-color: #f9fafb;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, background-color 0.2s ease;
+      }
+
+      .feature-card:hover {
+        border-color: rgba(245, 179, 0, 0.7);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+        transform: translateY(-3px);
+        background-color: #ffffff;
+      }
+
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background-color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.1rem;
+        box-shadow: 0 10px 24px rgba(148, 163, 184, 0.3);
+      }
+
+      .feature-icon svg {
+        width: 24px;
+        height: 24px;
+        color: var(--color-secondary);
+      }
+
+      .feature-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.6rem;
+        color: var(--color-primary);
+      }
+
+      .feature-card p {
+        font-size: 0.95rem;
+        color: var(--color-muted);
+      }
+
+      /* How it works */
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 3.5rem;
+      }
+
+      .step {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+      }
+
+      @media (min-width: 1024px) {
+        .step {
+          flex-direction: row;
+        }
+
+        .step--reverse {
+          flex-direction: row-reverse;
+        }
+      }
+
+      .step-media {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+      }
+
+      .step-media-inner {
+        position: relative;
+        width: 100%;
+        max-width: 340px;
+      }
+
+      .step-glow {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        filter: blur(72px);
+        opacity: 0.8;
+        transform: translateY(18px);
+      }
+
+      .step-glow--secondary {
+        background: rgba(245, 179, 0, 0.4);
+      }
+
+      .step-glow--primary {
+        background: rgba(15, 23, 42, 0.18);
+      }
+
+      .step-glow--green {
+        background: rgba(22, 163, 74, 0.32);
+      }
+
+      .step-image {
+        position: relative;
+        z-index: 1;
+        border-radius: 28px;
+        box-shadow: var(--shadow-soft);
+        overflow: hidden;
+      }
+
+      .step-content {
+        flex: 1;
+      }
+
+      .step-pill {
+        display: inline-block;
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+      }
+
+      .step-pill--blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .step-pill--amber {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .step-pill--green {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .step-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.9rem;
+        color: var(--color-primary);
+      }
+
+      .step-text {
+        font-size: 1rem;
+        color: var(--color-muted);
+        margin-bottom: 1rem;
+      }
+
+      .step-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+
+      .step-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 500;
+        color: #374151;
+      }
+
+      .step-list svg {
+        width: 20px;
+        height: 20px;
+        color: #16a34a;
+        flex-shrink: 0;
+      }
+
+      /* Testimonials */
+      .testimonial-grid {
+        display: grid;
+        gap: 1.75rem;
+      }
+
+      @media (min-width: 768px) {
+        .testimonial-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      .testimonial-card {
+        position: relative;
+        padding: 1.9rem 1.65rem;
+        border-radius: 22px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.6);
+      }
+
+      .stars {
+        display: flex;
+        gap: 0.25rem;
+        margin-bottom: 0.9rem;
+        color: #fbbf24;
+        font-size: 0.9rem;
+      }
+
+      .testimonial-text {
+        font-style: italic;
+        font-size: 1rem;
+        color: rgba(249, 250, 251, 0.92);
+        margin-bottom: 1.4rem;
+      }
+
+      .testimonial-name {
+        font-weight: 600;
+        margin-bottom: 0.1rem;
+      }
+
+      .testimonial-role {
+        font-size: 0.85rem;
+        color: rgba(209, 213, 219, 0.85);
+      }
+
+      /* CTA */
+      .cta {
+        text-align: center;
+      }
+
+      .cta h2 {
+        font-size: clamp(2rem, 3vw + 1.1rem, 2.9rem);
+        margin-bottom: 0.8rem;
+        color: var(--color-primary);
+      }
+
+      .cta p {
+        font-size: 1.05rem;
+        color: var(--color-muted);
+        margin-bottom: 1.9rem;
+      }
+
+      .cta-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      /* Footer */
+      .site-footer {
+        border-top: 1px solid var(--color-border);
+        background: #f9fafb;
+        padding-block: 2.5rem;
+        font-size: 0.9rem;
+      }
+
+      .footer-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+      }
+
+      .footer-main {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+
+      .footer-brand img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .footer-brand span {
+        font-weight: 700;
+      }
+
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.25rem;
+        color: #6b7280;
+      }
+
+      .footer-links a:hover {
+        color: var(--color-primary);
+      }
+
+      .footer-copy {
+        color: #9ca3af;
+        text-align: center;
+      }
+
+      @media (min-width: 768px) {
+        .footer-inner {
+          gap: 1.25rem;
+        }
+
+        .footer-main {
+          flex-direction: row;
+        }
+
+        .footer-copy {
+          text-align: left;
+        }
+      }
+
+      /* Responsive tweaks */
+      @media (min-width: 768px) {
+        .nav-links--desktop {
+          display: flex;
+        }
+
+        .nav-toggle {
+          display: none;
+        }
+      }
+
+      @media (max-width: 639px) {
+        .hero-subtitle {
+          font-size: 0.98rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <div class="nav-brand">
+          <img
+            src="assets/logo.webp"
+            alt="WorthLens logo"
+            class="nav-logo"
+          />
+          <span class="brand-name">WorthLens</span>
+        </div>
+
+        <nav class="nav-links nav-links--desktop">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it Works</a>
+          <a href="#reviews">Reviews</a>
+          <a href="redirect.html" class="btn btn-primary nav-cta">Get the App</a>
+        </nav>
+
+        <button class="nav-toggle" aria-label="Open navigation" data-mobile-toggle>
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+
+      <div class="mobile-nav" aria-hidden="true">
+        <div class="mobile-nav-panel">
+          <button class="mobile-nav-close" aria-label="Close navigation" data-mobile-close>
+            <i data-lucide="x"></i>
+          </button>
+          <nav class="mobile-nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How it Works</a>
+            <a href="#reviews">Reviews</a>
+            <a href="redirect.html" class="btn btn-primary btn-block">Download Now</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero" id="top">
+        <div class="hero-bg hero-bg--top"></div>
+        <div class="hero-bg hero-bg--bottom"></div>
+
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <div class="hero-badge">
+              <i data-lucide="star"></i>
+              <span>#1 App for Resellers</span>
+            </div>
+
+            <h1 class="hero-title">
+              Turn Photos into
+              <span class="hero-highlight">
+                Profit
+                <svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M0 5 Q 50 10 100 5" />
+                </svg>
+              </span>
+            </h1>
+
+            <p class="hero-subtitle">
+              Whether you’re reselling casually or running a side hustle, WorthLens helps you instantly
+              identify items, estimate resale value, and create optimized listings from a single photo.
+            </p>
+
+            <div class="hero-actions">
+              <a href="redirect.html" class="btn btn-primary btn-large">Download App</a>
+            </div>
+
+            <div class="hero-trust">
+              <div class="avatar-group" aria-hidden="true">
+                <div class="avatar">
+                  <img
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=1"
+                    alt="Seller avatar 1"
+                  />
+                </div>
+                <div class="avatar">
+                  <img
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=2"
+                    alt="Seller avatar 2"
+                  />
+                </div>
+                <div class="avatar">
+                  <img
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=3"
+                    alt="Seller avatar 3"
+                  />
+                </div>
+                <div class="avatar">
+                  <img
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=4"
+                    alt="Seller avatar 4"
+                  />
+                </div>
+              </div>
+              <p>Trusted by 50,000+ sellers</p>
+            </div>
+          </div>
+
+          <div class="hero-phones" aria-hidden="true">
+            <img
+              src="assets/hero_image.webp"
+              alt="WorthLens app mockup"
+              class="hero-mockup"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section id="features" class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Everything you need to sell smarter</h2>
+            <p>
+              Stop guessing prices and wasting time writing descriptions. Let AI handle the heavy lifting.
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card">
+              <div class="feature-icon">
+                <i data-lucide="scan"></i>
+              </div>
+              <h3>Scan Any Item</h3>
+              <p>
+                Simply take a picture. Our AI recognizes your item, identifies key details, and matches it
+                against popular marketplaces.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-icon">
+                <i data-lucide="tag"></i>
+              </div>
+              <h3>Smart Price Recommendations</h3>
+              <p>
+                Get real-time price data based on market demand. Choose between quick-sale pricing or
+                maximum-value pricing.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-icon">
+                <i data-lucide="list-plus"></i>
+              </div>
+              <h3>Smart Listings That Sell</h3>
+              <p>
+                Generate SEO-optimized titles and descriptions designed to increase visibility and
+                conversions on resale marketplaces.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-icon">
+                <i data-lucide="trending-up"></i>
+              </div>
+              <h3>Track Your Collection</h3>
+              <p>
+                Save scanned items, monitor their value over time, and manage your entire resale inventory
+                in one place.
+              </p>
+            </article>
+          </div>
+
+          <div style="text-align: center; margin-top: 3rem;">
+            <a href="redirect.html" class="btn btn-primary btn-large">
+              <i data-lucide="smartphone"></i>
+              <span>Download App</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section id="how-it-works" class="section section--muted">
+        <div class="container">
+          <div class="steps">
+            <!-- Step 1 -->
+            <div class="step">
+              <div class="step-media">
+                <div class="step-media-inner">
+                  <div class="step-glow step-glow--secondary"></div>
+                  <div class="step-image">
+                    <img
+                      src="assets/step_1.webp"
+                      alt="Scanning an item in WorthLens"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-content">
+                <div class="step-pill step-pill--blue">Step 01</div>
+                <h3 class="step-title">Snap &amp; Analyze</h3>
+                <p class="step-text">
+                  Point your camera at any item. Our advanced computer vision identifies the object, brand,
+                  and condition instantly.
+                </p>
+                <ul class="step-list">
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Instant visual recognition</span>
+                  </li>
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Condition assessment</span>
+                  </li>
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Brand identification</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step step--reverse">
+              <div class="step-media">
+                <div class="step-media-inner">
+                  <div class="step-glow step-glow--primary"></div>
+                  <div class="step-image">
+                    <img
+                      src="assets/step_2.webp"
+                      alt="Price analysis in WorthLens"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-content">
+                <div class="step-pill step-pill--amber">Step 02</div>
+                <h3 class="step-title">Get the Real Value</h3>
+                <p class="step-text">
+                  Don't undersell your treasures. WorthLens compares your item against thousands of recent
+                  sales to give you accurate pricing.
+                </p>
+                <ul class="step-list">
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Real-time market data</span>
+                  </li>
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Quick Sale vs Top Value pricing</span>
+                  </li>
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Condition assessment</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step">
+              <div class="step-media">
+                <div class="step-media-inner">
+                  <div class="step-glow step-glow--green"></div>
+                  <div class="step-image">
+                    <img
+                      src="assets/step_3.webp"
+                      alt="Listing generation in WorthLens"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-content">
+                <div class="step-pill step-pill--green">Step 03</div>
+                <h3 class="step-title">List &amp; Sell</h3>
+                <p class="step-text">
+                  Copy-paste optimized titles and descriptions directly to eBay, FB Marketplace etc.
+                </p>
+                <ul class="step-list">
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>SEO-optimized titles</span>
+                  </li>
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Detailed condition descriptions</span>
+                  </li>
+                  <li>
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Cross-platform ready</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 3rem;">
+            <a href="redirect.html" class="btn btn-primary btn-large">
+              <i data-lucide="smartphone"></i>
+              <span>Download App</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section id="reviews" class="section section--primary">
+        <div class="container">
+          <div class="section-header">
+            <h2>Loved by Resellers</h2>
+            <p>Join thousands of people making money from their closet.</p>
+          </div>
+
+          <div class="testimonial-grid">
+            <article class="testimonial-card">
+              <div class="stars" aria-hidden="true">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <p class="testimonial-text">
+                "WorthLens changed my flipping game. I used to spend hours researching prices. Now I just snap
+                a pic and know exactly what it's worth."
+              </p>
+              <div>
+                <div class="testimonial-name">Sarah Jenkins</div>
+                <div class="testimonial-role">Seller on eBay</div>
+              </div>
+            </article>
+
+            <article class="testimonial-card">
+              <div class="stars" aria-hidden="true">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <p class="testimonial-text">
+                "The accuracy is insane. It recognized an obscure 80s watch I found at a garage sale instantly.
+                Best app for thrifters."
+              </p>
+              <div>
+                <div class="testimonial-name">Mike Ross</div>
+                <div class="testimonial-role">Vintage Collector</div>
+              </div>
+            </article>
+
+            <article class="testimonial-card">
+              <div class="stars" aria-hidden="true">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <p class="testimonial-text">
+                "The listing generator writes better descriptions than I do. My sales have gone up 40% since I
+                started using the optimized titles."
+              </p>
+              <div>
+                <div class="testimonial-name">Jessica Lee</div>
+                <div class="testimonial-role">Full Time Reseller</div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="section cta">
+        <div class="container">
+          <div class="cta">
+            <h2>Ready to start flipping?</h2>
+            <p>Download WorthLens today and turn your clutter into cash.</p>
+            <div class="cta-actions">
+              <a href="redirect.html" class="btn btn-primary btn-large">
+                <i data-lucide="smartphone"></i>
+                <span>Download App</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-main">
+          <div class="footer-brand">
+            <img
+              src="assets/logo.webp"
+              alt="WorthLens logo"
+            />
+            <span>WorthLens</span>
+          </div>
+
+          <nav class="footer-links">
+            <a href="https://privacy.worthlensapp.com/">Privacy</a>
+            <a href="https://terms.worthlensapp.com/">Terms</a>
+            <a href="https://contact.worthlensapp.com/">Contact</a>
+          </nav>
+        </div>
+
+        <p class="footer-copy">
+          &copy; <span data-year></span> WorthLens. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Icons & behavior scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var header = document.querySelector(".site-header");
+        var mobileNav = document.querySelector(".mobile-nav");
+        var openBtn = document.querySelector("[data-mobile-toggle]");
+        var closeBtn = document.querySelector("[data-mobile-close]");
+
+        function updateHeader() {
+          if (!header) return;
+          if (window.scrollY > 50) {
+            header.classList.add("site-header--scrolled");
+          } else {
+            header.classList.remove("site-header--scrolled");
+          }
+        }
+
+        window.addEventListener("scroll", updateHeader, { passive: true });
+        updateHeader();
+
+        if (openBtn && mobileNav) {
+          openBtn.addEventListener("click", function () {
+            mobileNav.classList.add("open");
+          });
+        }
+
+        if (closeBtn && mobileNav) {
+          closeBtn.addEventListener("click", function () {
+            mobileNav.classList.remove("open");
+          });
+        }
+
+        if (mobileNav) {
+          mobileNav.addEventListener("click", function (event) {
+            if (event.target === mobileNav) {
+              mobileNav.classList.remove("open");
+            }
+          });
+
+          mobileNav.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+              mobileNav.classList.remove("open");
+            });
+          });
+        }
+
+        // Smooth scroll for in-page links
+        document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+          link.addEventListener("click", function (event) {
+            var href = link.getAttribute("href");
+            if (!href || href === "#") return;
+
+            var targetId = href.slice(1);
+            var targetEl = document.getElementById(targetId);
+            if (!targetEl) return;
+
+            event.preventDefault();
+            var headerOffset = header ? header.offsetHeight + 12 : 0;
+            var rect = targetEl.getBoundingClientRect();
+            var offset = rect.top + window.pageYOffset - headerOffset;
+
+            window.scrollTo({ top: offset, behavior: "smooth" });
+          });
+        });
+
+        // Dynamic year in footer
+        var yearEl = document.querySelector("[data-year]");
+        if (yearEl) {
+          yearEl.textContent = new Date().getFullYear();
+        }
+
+        // Initialize Lucide icons if available
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+          window.lucide.createIcons();
+        }
+      });
+    </script>
+  </body>
+</html>
